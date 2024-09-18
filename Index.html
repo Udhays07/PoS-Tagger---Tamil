@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil POS Tagger</title>
+    <style>
+        body {
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        header {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            text-align: center;
+            background-color: rgb(0, 132, 255);
+            padding: 10px;
+        }
+        textarea {
+            margin: 20px;
+            width: 90%;
+            padding: 10px;
+            height: 100px;
+            border-radius: 5px;
+            border-color: black;
+        }
+        button, td {
+            height: 40px;
+            width: 120px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        table {
+            margin: 20px auto;
+        }
+        #tagged-output {
+            width: 90%;
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid black;
+            min-height: 100px;
+        }
+        #word-box {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tamil POS Tagger</h1>
+    </header>
+    <main>
+        <textarea id="textInput" rows="5" placeholder="Enter your text here..."></textarea>
+        <br>
+        <button onclick="processText()">Process Text</button>
+        
+        <div id="word-box">Current Word: <span id="current-word"></span></div>
+        
+        <table>
+            <tr>
+                <td><button onclick="tagWord('NN')">Noun</button></td>
+                <td><button onclick="tagWord('NNC')">Compound Noun</button></td>
+                <td><button onclick="tagWord('NNP')">Proper Noun</button></td>
+                <td><button onclick="tagWord('NNPC')">Compound Proper Noun</button></td>
+                <td><button onclick="tagWord('ORD')">Ordinals</button></td>
+                <td><button onclick="tagWord('CRD')">Cardinals</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('PRP')">Pronoun</button></td>
+                <td><button onclick="tagWord('PRIN')">Pronoun Interrogative</button></td>
+                <td><button onclick="tagWord('PRID')">Pronoun Indefinite</button></td>
+                <td><button onclick="tagWord('ADJ')">Adjective</button></td>
+                <td><button onclick="tagWord('ADV')">Adverb</button></td>
+                <td><button onclick="tagWord('VNAJ')">VNF Adjective</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('VNAV')">VNF Adverb</button></td>
+                <td><button onclick="tagWord('VBG')">Verbal Gerund</button></td>
+                <td><button onclick="tagWord('VF')">Verb Finite</button></td>
+                <td><button onclick="tagWord('VAX')">Verb Auxiliary</button></td>
+                <td><button onclick="tagWord('VINT')">Verb Infinite</button></td>
+                <td><button onclick="tagWord('CNJ')">Conjunction</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('CVB')">Conditional Verb</button></td>
+                <td><button onclick="tagWord('QW')">Question word</button></td>
+                <td><button onclick="tagWord('COM')">Complementizer</button></td>
+                <td><button onclick="tagWord('NNQ')">Quality Noun</button></td>
+                <td><button onclick="tagWord('QTF')">Quantifiers</button></td>
+                <td><button onclick="tagWord('PPO')">PostPositions</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('DET')">Determiners</button></td>
+                <td><button onclick="tagWord('INT')">Intensifier</button></td>
+                <td><button onclick="tagWord('ECH')">Echo Words</button></td>
+                <td><button onclick="tagWord('EMP')">Emphasis</button></td>
+                <td><button onclick="tagWord('COMM')">Comma</button></td>
+                <td><button onclick="tagWord('DOT')">Dot</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('QM')">Question Marks</button></td>
+                <td><button onclick="tagWord('RDW')">Reduplication Words</button></td>
+                <td><button style="background:rgb(41, 41, 41); -webkit-text-fill-color: white;" onclick="undo()">Undo</button></td>
+            </tr>
+        </table>
+        
+        <div id="tagged-output"></div>
+        
+        <button onclick="downloadFile()">Download Tagged Output</button>
+    </main>
+
+    <script>
+        let words = [];
+        let currentIndex = 0;
+        let taggedWords = [];
+
+        function processText() {
+            const textInput = document.getElementById('textInput').value;
+            words = textInput.trim().split(/\s+/);
+            currentIndex = 0;
+            taggedWords = [];
+            updateWordBox();
+            updateTaggedOutput();
+        }
+
+        function updateWordBox() {
+            if (currentIndex < words.length) {
+                document.getElementById('current-word').innerText = words[currentIndex];
+            } else {
+                document.getElementById('current-word').innerText = 'No more words.';
+            }
+        }
+
+        function tagWord(tag) {
+            if (currentIndex < words.length) {
+                taggedWords.push(`<${tag}>${words[currentIndex]}</${tag}>`);
+                currentIndex++;
+                updateWordBox();
+                updateTaggedOutput();
+            }
+        }
+
+        function undo() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                taggedWords.pop();
+                updateWordBox();
+                updateTaggedOutput();
+            }
+        }
+
+        function updateTaggedOutput() {
+            document.getElementById('tagged-output').innerText = taggedWords.join(' ');
+        }
+
+        function downloadFile() {
+            // const taggedOutput = taggedWords.join(' ');
+            const taggedOutput = taggedWords.join('\n');            
+            // Create a downloadable text file
+            const blob = new Blob([taggedOutput], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'tagged_output.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link); // Cleanup after download
+        }
+    </script>
+</body>
+</html>
