@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Tamil POS Tagger</title>
+    <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+    <header>
+        <h1 id="title">Tamil POS Tagger</h1>
+    </header>
+    <main>
+        <div>
+            <ul id="navbar">
+                <li><a href="index1.html">Noun Chunker</a></li>
+            </ul>
+        </div>
+        <textarea id="textInput" rows="5" placeholder="Enter your text here..."></textarea>
+        <br>
+        <button onclick="processText()">Process Text</button>
+
+        <div id="clickableWordsContainer" class="clickable-words-container"></div>
+
+        <table>
+            <tr>
+                <td><button onclick="tagWord('NN')">Noun</button></td>
+                <td><button onclick="tagWord('NNC')">Compound Noun</button></td>
+                <td><button onclick="tagWord('NNP')">Proper Noun</button></td>
+                <td><button onclick="tagWord('NNPC')">Compound Proper Noun</button></td>
+                <td><button onclick="tagWord('ORD')">Ordinals</button></td>
+                <td><button onclick="tagWord('CRD')">Cardinals</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('PRP')">Pronoun</button></td>
+                <td><button onclick="tagWord('PRIN')">Pronoun Interrogative</button></td>
+                <td><button onclick="tagWord('PRID')">Pronoun Indefinite</button></td>
+                <td><button onclick="tagWord('ADJ')">Adjective</button></td>
+                <td><button onclick="tagWord('ADV')">Adverb</button></td>
+                <td><button onclick="tagWord('VNAJ')">VNF Adjective</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('VNAV')">VNF Adverb</button></td>
+                <td><button onclick="tagWord('VBG')">Verbal Gerund</button></td>
+                <td><button onclick="tagWord('VF')">Verb Finite</button></td>
+                <td><button onclick="tagWord('VAX')">Verb Auxiliary</button></td>
+                <td><button onclick="tagWord('VINT')">Verb Infinite</button></td>
+                <td><button onclick="tagWord('CNJ')">Conjunction</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('CVB')">Conditional Verb</button></td>
+                <td><button onclick="tagWord('QW')">Question word</button></td>
+                <td><button onclick="tagWord('COM')">Complementizer</button></td>
+                <td><button onclick="tagWord('NNQ')">Quality Noun</button></td>
+                <td><button onclick="tagWord('QTF')">Quantifiers</button></td>
+                <td><button onclick="tagWord('PPO')">PostPositions</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('DET')">Determiners</button></td>
+                <td><button onclick="tagWord('INT')">Intensifier</button></td>
+                <td><button onclick="tagWord('ECH')">Echo Words</button></td>
+                <td><button onclick="tagWord('EMP')">Emphasis</button></td>
+                <td><button onclick="tagWord('COMM')">Comma</button></td>
+                <td><button onclick="tagWord('DOT')">Dot</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="tagWord('QM')">Question Marks</button></td>
+                <td><button onclick="tagWord('RDW')">Reduplication Words</button></td>
+                <td><button style="background:rgb(41, 41, 41); -webkit-text-fill-color: white;" onclick="undo()">Undo</button></td>
+                <td><button style="background:rgb(41, 41, 41); -webkit-text-fill-color: white;" onclick="clearData()">Clear data</button></td>
+            </tr>
+        </table>
+
+        <div id="tagged-output"></div>
+
+        <button onclick="downloadFile()">Download Tagged Output</button>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
