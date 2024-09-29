@@ -1,175 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tamil POS Tagger</title>
-    <style>
-        body {
-            background-color: white;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        header {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            text-align: center;
-            background-color: rgb(0, 132, 255);
-            padding: 10px;
-        }
-        textarea {
-            margin: 20px;
-            width: 90%;
-            padding: 10px;
-            height: 100px;
-            border-radius: 5px;
-            border-color: black;
-        }
-        button, td {
-            height: 40px;
-            width: 120px;
-            margin: 5px;
-            cursor: pointer;
-        }
-        table {
-            margin: 20px auto;
-        }
-        #tagged-output {
-            width: 90%;
-            margin: 20px;
-            padding: 10px;
-            border: 1px solid black;
-            min-height: 100px;
-        }
-        #word-box {
-            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-            font-size: 24px;
-            font-weight: bold;
-            margin: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
     <header>
-        <h1>Tamil POS Tagger</h1>
+        <h1 id="title">Tamil POS Tagger</h1>
+        <div class="navButtons">
+            <button class="navbuttons" onclick="processText()">Process Text</button>
+            <button class="navbuttons" onclick="undo()">Undo</button>
+            <button class="navbuttons" onclick="clearData()">Clear data</button>
+            <button class="navbuttons" onclick="downloadFile()">Download</button>
+            <button class="navbuttons" onclick="editText()">Edit Text</button>
+            <button class="navbuttons" onclick="saveProcessText()">Save</button>
+        </div>
     </header>
-    <main>
-        <textarea id="textInput" rows="5" placeholder="Enter your text here..."></textarea>
-        <br>
-        <button onclick="processText()">Process Text</button>
-        
-        <div id="word-box">Current Word: <span id="current-word"></span></div>
-        
-        <table>
-            <tr>
-                <td><button onclick="tagWord('NN')">Noun</button></td>
-                <td><button onclick="tagWord('NNC')">Compound Noun</button></td>
-                <td><button onclick="tagWord('NNP')">Proper Noun</button></td>
-                <td><button onclick="tagWord('NNPC')">Compound Proper Noun</button></td>
-                <td><button onclick="tagWord('ORD')">Ordinals</button></td>
-                <td><button onclick="tagWord('CRD')">Cardinals</button></td>
-            </tr>
-            <tr>
-                <td><button onclick="tagWord('PRP')">Pronoun</button></td>
-                <td><button onclick="tagWord('PRIN')">Pronoun Interrogative</button></td>
-                <td><button onclick="tagWord('PRID')">Pronoun Indefinite</button></td>
-                <td><button onclick="tagWord('ADJ')">Adjective</button></td>
-                <td><button onclick="tagWord('ADV')">Adverb</button></td>
-                <td><button onclick="tagWord('VNAJ')">VNF Adjective</button></td>
-            </tr>
-            <tr>
-                <td><button onclick="tagWord('VNAV')">VNF Adverb</button></td>
-                <td><button onclick="tagWord('VBG')">Verbal Gerund</button></td>
-                <td><button onclick="tagWord('VF')">Verb Finite</button></td>
-                <td><button onclick="tagWord('VAX')">Verb Auxiliary</button></td>
-                <td><button onclick="tagWord('VINT')">Verb Infinite</button></td>
-                <td><button onclick="tagWord('CNJ')">Conjunction</button></td>
-            </tr>
-            <tr>
-                <td><button onclick="tagWord('CVB')">Conditional Verb</button></td>
-                <td><button onclick="tagWord('QW')">Question word</button></td>
-                <td><button onclick="tagWord('COM')">Complementizer</button></td>
-                <td><button onclick="tagWord('NNQ')">Quality Noun</button></td>
-                <td><button onclick="tagWord('QTF')">Quantifiers</button></td>
-                <td><button onclick="tagWord('PPO')">PostPositions</button></td>
-            </tr>
-            <tr>
-                <td><button onclick="tagWord('DET')">Determiners</button></td>
-                <td><button onclick="tagWord('INT')">Intensifier</button></td>
-                <td><button onclick="tagWord('ECH')">Echo Words</button></td>
-                <td><button onclick="tagWord('EMP')">Emphasis</button></td>
-                <td><button onclick="tagWord('COMM')">Comma</button></td>
-                <td><button onclick="tagWord('DOT')">Dot</button></td>
-            </tr>
-            <tr>
-                <td><button onclick="tagWord('QM')">Question Marks</button></td>
-                <td><button onclick="tagWord('RDW')">Reduplication Words</button></td>
-                <td><button style="background:rgb(41, 41, 41); -webkit-text-fill-color: white;" onclick="undo()">Undo</button></td>
-            </tr>
-        </table>
-        
-        <div id="tagged-output"></div>
-        
-        <button onclick="downloadFile()">Download Tagged Output</button>
-    </main>
+    <div class="mainBody">
+        <div class="mainContent">
+            <div class="textDropdown">
+                <div class="inputText">
+                    <div id="textInput" contentEditable="true" class="text-input"></div>
+                </div>
+                <div class="processText" id="processText" style="display: none;">
+                    <div class="container">
+                        <div class="nounNav">
+                            <div id="nounText"></div>
+                        </div>
+                        <div class="nounTable">
+                            <table>
+                                <tr class="nountr">
+                                    <td class="nountd">
+                                        <div class="button-container">
+                                            <button class="nounButton" onclick="toggleInput('nounInput')">Noun</button>
+                                            <div class="input-area" id="nounInput">
+                                                <textarea class="nounTextArea" placeholder="Type the noun..." rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </td>
 
-    <script>
-        let words = [];
-        let currentIndex = 0;
-        let taggedWords = [];
+                                    <!-- Number Dropdown -->
+                                    <td class="nountd">
+                                        <div class="button-container">
+                                            <button class="nounButton" onclick="toggleInput('numberDropdown')">Number</button>
+                                            <div class="input-area" id="numberDropdown">
+                                                <select>
+                                                    <option value="singular">Singular</option>
+                                                    <option value="plural">Plural</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
 
-        function processText() {
-            const textInput = document.getElementById('textInput').value;
-            words = textInput.trim().split(/\s+/);
-            currentIndex = 0;
-            taggedWords = [];
-            updateWordBox();
-            updateTaggedOutput();
-        }
+                                    <!-- Fillers Text Area -->
+                                    <td class="nountd">
+                                        <div class="button-container">
+                                            <button class="nounButton" onclick="toggleInput('fillerInput')">Fillers</button>
+                                            <div class="input-area" id="fillerInput">
+                                                <textarea class="nounTextArea" placeholder="Type the filler..." rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </td>
 
-        function updateWordBox() {
-            if (currentIndex < words.length) {
-                document.getElementById('current-word').innerText = words[currentIndex];
-            } else {
-                document.getElementById('current-word').innerText = 'No more words.';
-            }
-        }
+                                    <!-- Case Markers Dropdown -->
+                                    <td class="nountd">
+                                        <div class="button-container">
+                                            <button class="nounButton" onclick="toggleInput('caseMarkersDropdown')">Case Markers</button>
+                                            <div class="input-area" id="caseMarkersDropdown">
+                                                <select>
+                                                    <option value=""></option>
+                                                    <option value="ஐ">ஐ</option>
+                                                    <option value="ஆல்">ஆல்</option>
+                                                    <option value="கு">கு</option>
+                                                    <option value="இன்">இன்</option>
+                                                    <option value="அது">அது</option>
+                                                    <option value="கன்">கன்</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </td>
 
-        function tagWord(tag) {
-            if (currentIndex < words.length) {
-                taggedWords.push(`<${tag}>${words[currentIndex]}</${tag}>`);
-                currentIndex++;
-                updateWordBox();
-                updateTaggedOutput();
-            }
-        }
+                                    <!-- Postposition Text Area -->
+                                    <td class="nountd">
+                                        <div class="button-container">
+                                            <button class="nounButton" onclick="toggleInput('postpositionInput')">Postposition</button>
+                                            <div class="input-area" id="postpositionInput">
+                                                <textarea class="nounTextArea" placeholder="Type the postposition..." rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <table>
+                    <tr>
+                        <td><button onclick="showProcessText()" onclick="tagNoun()">Noun</button></td>
+                        <td><button onclick="tagWord('NNC')">Compound Noun</button></td>
+                        <td><button onclick="tagWord('NNP')">Proper Noun</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="tagWord('CRD')">Cardinals</button></td>
+                        <td><button onclick="tagWord('PRP')">Pronoun</button></td>
+                        <td><button onclick="tagWord('PRIN')">Pronoun Interrogative</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="tagWord('PRID')">Pronoun Indefinite</button></td>
+                        <td><button onclick="tagWord('ADJ')">Adjective</button></td>
+                        <td><button onclick="tagWord('ADV')">Adverb</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="tagWord('VNAJ')">VNF Adjective</button></td>
+                        <td><button onclick="tagWord('VNAV')">VNF Adverb</button></td>
+                        <td><button onclick="tagWord('VBG')">Verbal Gerund</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="tagWord('VF')">Verb Finite</button></td>
+                        <td><button onclick="tagWord('VAX')">Verb Auxiliary</button></td>
+                        <td><button onclick="tagWord('VINT')">Verb Infinite</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="tagWord('CNJ')">Conjunction</button></td>
+                        <td><button onclick="tagWord('QTF')">Quantifiers</button></td>
+                        <td><button onclick="tagWord('PPO')">PostPositions</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="tagWord('DET')">Determiners</button></td>
+                        <td><button onclick="tagWord('INT')">Intensifier</button></td>
+                        <td><button onclick="tagWord('ECH')">Echo Words</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="tagWord('EMP')">Emphasis</button></td>
+                        <td><button onclick="tagWord('COMM')">Comma</button></td>
+                        <td><button onclick="tagWord('DOT')">Dot</button></td>
+                    </tr>
+                    <tr>
+                        <td><button onclick="tagWord('QM')">Question Marks</button></td>
+                        <td><button onclick="tagWord('RDW')">Reduplication Words</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="mainOutput">
+            <div id="tagged-output"></div>
+        </div>
+    </div>
 
-        function undo() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                taggedWords.pop();
-                updateWordBox();
-                updateTaggedOutput();
-            }
-        }
-
-        function updateTaggedOutput() {
-            document.getElementById('tagged-output').innerText = taggedWords.join(' ');
-        }
-
-        function downloadFile() {
-            // const taggedOutput = taggedWords.join(' ');
-            const taggedOutput = taggedWords.join('\n');            
-            // Create a downloadable text file
-            const blob = new Blob([taggedOutput], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'tagged_output.txt';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link); // Cleanup after download
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
