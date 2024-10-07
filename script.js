@@ -2,7 +2,7 @@ let currentWordElem = null;
 let sentenceData = JSON.parse(localStorage.getItem("sentenceData")) || []; 
 let currentSentence = sentenceData.length > 0 ? sentenceData[sentenceData.length - 1] : {};
 let originalWords = []; 
-let selectedWord = "";
+let selectedWord = ""; // Store the selected word
 let isEditing = true;  // Flag to track editing state
 
 function processText() {
@@ -33,7 +33,6 @@ function processText() {
         isEditing = false;
     }
 }
-
 function editText() {
     if (!isEditing) {
         let textInputDiv = document.getElementById("textInput");
@@ -62,14 +61,17 @@ function selectWord(spanElement, word, index) {
     selectedWord = word; // Store the selected word
 }
 
+
 function tagWord(tag) {
     if (!currentWordElem) {
         alert("Please select a word first!");
         return;
     }
+
+  
     let word = currentWordElem.textContent;
 
-    // Clear previous tags for this word
+    
     for (let existingTag in currentSentence) {
         if (currentSentence[existingTag].includes(word)) {
             currentSentence[existingTag] = currentSentence[existingTag].filter(w => w !== word);
@@ -79,23 +81,34 @@ function tagWord(tag) {
         }
     }
 
-    // Add new tag
+    
     if (!currentSentence[tag]) {
         currentSentence[tag] = [];
     }
     currentSentence[tag].push(word);
 
+    
     currentWordElem.remove();
 
+  
     currentWordElem.classList.add('tagged');
     currentWordElem.setAttribute('data-tag', tag);
-    currentWordElem.title = tag;
+    currentWordElem.title = tag; 
 
+   
     updateJSONData();
+
+    
     displayTaggedOutput();
 }
-
 function undo() {
+    // Check if a word was previously selected and tagged
+    if (!currentWordElem && selectedWord) {
+        // Find the previously tagged word in the document
+        let taggedWordElems = Array.from(document.getElementsByClassName('tagged'));
+        currentWordElem = taggedWordElems.find(elem => elem.textContent === selectedWord);
+    }
+
     if (!currentWordElem) {
         alert("Please select a word first!");
         return;
@@ -119,35 +132,48 @@ function undo() {
         currentWordElem.title = "";
 
         // Find the original position based on the saved index
-        let originalIndex = originalWords.find(obj => obj.word === word).index;
-        let textInputDiv = document.getElementById("textInput");
+        let originalIndex = originalWords.find(obj => obj.word === word)?.index;
+        if (originalIndex !== undefined) {
+            let textInputDiv = document.getElementById("textInput");
 
-        // Create a new span element for the word
-        let span = document.createElement("span");
-        span.textContent = word;
-        span.className = 'word-span';
-        span.onclick = function () {
-            selectWord(span, word, originalIndex);
-        };
+            // Create a new span element for the word
+            let span = document.createElement("span");
+            span.textContent = word;
+            span.className = 'word-span';
+            span.onclick = function () {
+                selectWord(span, word, originalIndex);
+            };
 
-        // Insert the span back into the correct position
-        let children = textInputDiv.childNodes;
-        let spaceNode = document.createTextNode(" ");  // Create a space node
-        
-        // Insert at the correct position, multiplying by 2 to account for space nodes
-        if (children.length > originalIndex * 2) {
-            textInputDiv.insertBefore(span, children[originalIndex * 2]);
-            textInputDiv.insertBefore(spaceNode, children[originalIndex * 2 + 1]);
-        } else {
-            textInputDiv.appendChild(span);
-            textInputDiv.appendChild(spaceNode);
+            // Insert the span back into the correct position
+            let children = textInputDiv.childNodes;
+            let spaceNode = document.createTextNode(" ");  // Create a space node
+            
+            // Insert at the correct position, multiplying by 2 to account for space nodes
+            if (children.length > originalIndex * 2) {
+                textInputDiv.insertBefore(span, children[originalIndex * 2]);
+                textInputDiv.insertBefore(spaceNode, children[originalIndex * 2 + 1]);
+            } else {
+                textInputDiv.appendChild(span);
+                textInputDiv.appendChild(spaceNode);
+            }
+
+            // Remove the last entry from the tagged output
+            let outputDiv = document.getElementById('tagged-output');
+            if (outputDiv.lastChild) {
+                outputDiv.removeChild(outputDiv.lastChild);
+            }
         }
     }
 
     // Update JSON data and output
     updateJSONData();
     displayTaggedOutput();
+
+    // Reset currentWordElem and selectedWord after undo
+    currentWordElem = null;
+    selectedWord = "";
 }
+
 
 function updateJSONData() {
     
@@ -221,15 +247,6 @@ function toggleInput(id) {
     }
 }
 
-function undoSelections() {
-    // Remove the last output item from the output area
-    const outputDiv = document.getElementById('output');
-    const lastOutputItem = outputDiv.lastChild;  // Get the last child of the output area
-
-    if (lastOutputItem) {
-        outputDiv.removeChild(lastOutputItem);  // Remove the last output item if it exists
-    }
-}
 function showProcessText() {
     if (!selectedWord) {
         alert("Please select a word first!");
@@ -240,13 +257,9 @@ function showProcessText() {
     document.getElementById('processText').style.display = 'block';
 
     // Show the selected word in the nounNav div
-    document.getElementById('nounText').innerHTML = `<p> Noun: ${selectedWord}</p>`;
+    document.getElementById('nounNav').innerHTML = `<p>Selected Word: ${selectedWord}</p>`;
 }
-    
-function toggleInput(inputId) {
-        const inputArea = document.getElementById(inputId);
-        inputArea.style.display = (inputArea.style.display === "none" || inputArea.style.display === "") ? "block" : "none";
-}
+
 function tagNoun() {
     if (!currentWordElem) {
         alert("Please select a word to tag.");
@@ -256,72 +269,47 @@ function tagNoun() {
     showProcessText();
 }
 
-function saveProcessText() {
-    const word = document.getElementById('wordInput').value;
-    const noun = document.getElementById('nounInput').querySelector('textarea').value;
-    const number = document.getElementById('numberDropdown').querySelector('select').value;
-    const filler = document.getElementById('fillerInput').querySelector('textarea').value;
-    const caseMarker = document.getElementById('caseMarkersDropdown').querySelector('select').value;
-    const postposition = document.getElementById('postpositionInput').querySelector('textarea').value;
-
-    // Check if "NN" (noun) is already in the sentence, if not, create an array for it
-    if (!currentSentence.NN) {
-        currentSentence.NN = [];
+    function toggleInput(inputId) {
+        const inputArea = document.getElementById(inputId);
+        inputArea.style.display = (inputArea.style.display === "none" || inputArea.style.display === "") ? "block" : "none";
     }
-
-    // Push the new noun data into the "NN" array
-    currentSentence.NN.push({
-        word: word,
-        Noun: noun,
-        Number: number,
-        Fillers: filler,
-        "Case Markers": caseMarker,
-        Postposition: postposition
-    });
-
-    // Display output
-    const outputDiv = document.getElementById('tagged-output');
-    const outputItem = document.createElement('div');
-    outputItem.classList.add('output-item');
-    outputItem.innerHTML = `<strong>Word:</strong>${word}<br>
-                            <strong>Noun:</strong> ${noun} <br>
-                            <strong>Number:</strong> ${number} <br>
-                            <strong>Fillers:</strong> ${filler} <br>
-                            <strong>Case Markers:</strong> ${caseMarker} <br>
-                            <strong>Postposition:</strong> ${postposition}`;
-    outputDiv.appendChild(outputItem);
-
-    // Clear input fields after saving
-    document.getElementById('wordInput').value = '';
-    document.getElementById('nounInput').querySelector('textarea').value = '';
-    document.getElementById('fillerInput').querySelector('textarea').value = '';
-    document.getElementById('postpositionInput').querySelector('textarea').value = '';
-    document.getElementById("processText").style.display = "none";
-
-    // Remove the word from textInput after saving
-    removeWordFromTextInput(word);
-
-    // Update the JSON data and save it to localStorage
-    updateJSONData();
-
-    // Display the updated JSON data
-    displayTaggedOutput();
-}
-
-function removeWordFromTextInput(word) {
-    const textInputDiv = document.getElementById("textInput");
-    const wordSpan = Array.from(textInputDiv.children).find(span => span.textContent === word);
     
-    if (wordSpan) {
-        wordSpan.remove(); // Remove the word span from the textInput
+
+    function saveProcessText() {
+        const noun = document.getElementById('nounInput').querySelector('textarea').value;
+        const number = document.getElementById('numberDropdown').querySelector('select').value;
+        const filler = document.getElementById('fillerInput').querySelector('textarea').value;
+        const caseMarker = document.getElementById('caseMarkersDropdown').querySelector('select').value;
+        const postposition = document.getElementById('postpositionInput').querySelector('textarea').value;
+    
+        // Display output
+        const outputDiv = document.getElementById('tagged-output');
+        const outputItem = document.createElement('div');
+        outputItem.classList.add('output-item');
+        outputItem.innerHTML = `<strong>Word:</strong> ${selectedWord}<br>
+                                <strong>Noun:</strong> ${noun} <br>
+                                <strong>Number:</strong> ${number} <br>
+                                <strong>Fillers:</strong> ${filler} <br>
+                                <strong>Case Markers:</strong> ${caseMarker} <br>
+                                <strong>Postposition:</strong> ${postposition}`;
+        outputDiv.appendChild(outputItem);
+    
+        // Clear input fields
+        document.getElementById('nounInput').querySelector('textarea').value = '';
+        document.getElementById('fillerInput').querySelector('textarea').value = '';
+        document.getElementById('postpositionInput').querySelector('textarea').value = '';
+        document.getElementById('processText').style.display = 'none'; // Hide processText div after saving
+    
+        // Remove the selected word from textInput
+        if (currentWordElem) {
+            currentWordElem.remove();
+        }
+    
+        // Reset the selection
+        selectedWord = "";
+        currentWordElem = null;
     }
-}
-
-function toggleInput(inputId) {
-    const inputArea = document.getElementById(inputId);
-    inputArea.style.display = (inputArea.style.display === "none" || inputArea.style.display === "") ? "block" : "none";
-}
-
+// Call this function on page load to restore previous state
 window.onload = function () {
     displayTaggedOutput(); // Restore the tagged output from the stored data
 };
