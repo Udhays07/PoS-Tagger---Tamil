@@ -24,9 +24,7 @@
                 </div>
                 <div class="processText" id="processText" style="display: none;">
                     <div class="container">
-                        <div class="nounNav">
-                            <div id="nounText"></div>
-                        </div>
+                        <div id="nounNav"></div>
                         <div class="nounTable">
                             <table>
                                 <tr class="nountr">
@@ -68,7 +66,6 @@
                                             <button class="nounButton" onclick="toggleInput('caseMarkersDropdown')">Case Markers</button>
                                             <div class="input-area" id="caseMarkersDropdown">
                                                 <select>
-                                                    <option value=""></option>
                                                     <option value="ஐ">ஐ</option>
                                                     <option value="ஆல்">ஆல்</option>
                                                     <option value="கு">கு</option>
@@ -98,7 +95,7 @@
             <div class="buttons">
                 <table>
                     <tr>
-                        <td><button onclick="showProcessText()" onclick="tagNoun()">Noun</button></td>
+                        <td><button onclick="showProcessText()" onclick="tagWord('NN')">Noun</button></td>
                         <td><button onclick="tagWord('NNC')">Compound Noun</button></td>
                         <td><button onclick="tagWord('NNP')">Proper Noun</button></td>
                     </tr>
